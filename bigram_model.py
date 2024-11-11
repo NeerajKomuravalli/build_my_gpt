@@ -5,50 +5,9 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+from utils import read_data, get_batch
+from encoder_decoder import EncoderDecoder
 
-def read_data(file_path) -> str:
-    if not os.path.exists(file_path):
-        raise FileExistsError(f"{file_path} is not a valid path")
-    data = []
-    with open(file_path, "r") as f:
-        data = f.readlines()
-    
-    data_str = "\n".join(data)
-
-    return data_str
-
-class EncoderDecoder:
-    def __init__(self, vocab:List[str]):
-        # Letter to number
-        self.encoder_dict = {}
-        # Number to letter
-        self.decoder_dict = {}
-        # Generate encoder and decoder dicts
-        for i, char in enumerate(vocab):
-            self.encoder_dict[char] = i
-            self.decoder_dict[i] = char
-        
-
-    def encode(self, data: str) -> List:
-        encoded_data = []
-        for d in data:
-            encoded_data.append(self.encoder_dict[d])
-        
-        return encoded_data
-
-    def decode(self, data:List) -> str:
-        decoded_data = ""
-        for d in data:
-            decoded_data += self.decoder_dict[d]
-
-        return decoded_data
-
-def get_batch(block_size, batch_size, data_tensor):
-    ix = torch.randint(len(data_tensor) - block_size, (batch_size,))
-    x = torch.stack([data_tensor[i:i+block_size] for i in ix])
-    y = torch.stack([data_tensor[i+1:i+block_size+1] for i in ix])
-
-    return x, y
 
 class BigramModel(nn.Module):
     def __init__(self, vocab_size:int):
